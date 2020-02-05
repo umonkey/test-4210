@@ -20,6 +20,19 @@ class TaskRepository
         $this->db = $db;
     }
 
+    public function add(Task $task): void
+    {
+        $id = $this->db->insert('tasks', [
+            'id' => $task->getId(),
+            'user' => $task->getUser(),
+            'email' => $task->getEmail(),
+            'text' => $task->getText(),
+            'completed' => $task->getCompleted(),
+        ]);
+
+        $task->setId($id);
+    }
+
     public function get(int $id): ?Task
     {
         $row = $this->db->fetchOne('SELECT * FROM tasks WHERE id = ?', [$id]);
@@ -33,5 +46,10 @@ class TaskRepository
         return array_map(function (array $row) {
             return new Task($row);
         }, $rows);
+    }
+
+    public function count(): int
+    {
+        return (int)$this->db->fetchCell('SELECT COUNT(1) FROM tasks');
     }
 }

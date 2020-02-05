@@ -14,7 +14,13 @@ abstract class AbstractController
 {
     protected function sendJSON(array $data): Response
     {
-        dd($data);
+        $data = json_encode($data);
+
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+
+        return new Response(200, $headers, $data);
     }
 
     protected function sendHtml(string $html, int $status = 200): Response

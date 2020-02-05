@@ -35,15 +35,32 @@ class AuthService
         $this->users = $users;
     }
 
-    public function requireUser(RequestInterface $request): User
+    public function checkCsrfToken(RequestInterface $request): bool
     {
-        $user = $this->getUser($request);
+        $form = $request->getParsedBody();
 
-        if (null === $user) {
-            throw new Unauthorized();
+        if (empty($form['csrf_token'])) {
+            return false;
         }
 
-        return $user;
+        $session = $this->session->getData($request);
+        if (empty($session['csrf_token'])) {
+            return false;
+        }
+
+        return $form['csrf_token'] === $session['csrf_token'];
+    }
+
+    public function getCsrfToken(RequestInterface $request): string
+    {
+        $session = $this->session->getData($request);
+
+        if (empty($session['csrf_token'])) {
+            $session['csrf_token'] = $this->getNewCsrfToken();
+            $this->session->setData($request, $session);
+        }
+
+        return $session['csrf_token'];
     }
 
     public function getUser(RequestInterface $request): ?User
@@ -56,5 +73,22 @@ class AuthService
 
         $user = $this->users->get($session['user_id']);
         return $user;
+    }
+
+    public function requireUser(RequestInterface $request): User
+    {
+        $user = $this->getUser($request);
+
+        if (null === $user) {
+            throw new Unauthorized();
+        }
+
+        return $user;
+    }
+
+    protected function getNewCsrfToken(): string
+    {
+        $token = bin2hex(random_bytes(16));
+        return $token;
     }
 }

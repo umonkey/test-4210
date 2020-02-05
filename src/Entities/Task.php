@@ -37,7 +37,7 @@ class Task
 
     public function __construct(array $row)
     {
-        $this->id = (int)$row['id'];
+        $this->id = empty($row['id']) ? null : (int)$row['id'];
         $this->user = $row['user'];
         $this->email = $row['email'];
         $this->text = $row['text'];

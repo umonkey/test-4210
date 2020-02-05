@@ -10,5 +10,6 @@ use FastRoute\RouteCollector;
 
 return function (RouteCollector $r) {
     $r->get('/', 'App\Controllers\HomeController:index');
-    $r->get('/foo/{id:[0-9]+}', 'App\Controllers\HomeController:index');
+    $r->get('/tasks.json', 'App\Controllers\TaskListController:index');
+    $r->post('/tasks/add', 'App\Controllers\AddTaskController:index');
 };

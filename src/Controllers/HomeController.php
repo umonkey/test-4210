@@ -40,10 +40,12 @@ class HomeController extends AbstractController
 
     public function index(RequestInterface $request): ResponseInterface
     {
-        $tasks = $this->tasks->getList(0, 3);
+        $user = $this->auth->getUser($request);
+        $token = $this->auth->getCsrfToken($request);
 
         $html = $this->template->render('pages/home.twig', [
-            'tasks' => $tasks,
+            'user' => $user,
+            'csrf_token' => $token,
         ]);
 
         return $this->sendHtml($html);
