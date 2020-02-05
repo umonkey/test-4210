@@ -75,6 +75,16 @@ class AuthService
         return $user;
     }
 
+    public function logOut(RequestInterface $request): void
+    {
+        $session = $this->session->getData($request);
+
+        unset($session['user_id']);
+        unset($session['csrf_token']);
+
+        $this->session->setData($request, $session);
+    }
+
     public function requireUser(RequestInterface $request): User
     {
         $user = $this->getUser($request);
@@ -84,6 +94,13 @@ class AuthService
         }
 
         return $user;
+    }
+
+    public function setUser(RequestInterface $request, User $user): void
+    {
+        $session = $this->session->getData($request);
+        $session['user_id'] = $user->getId();
+        $this->session->setData($request, $session);
     }
 
     protected function getNewCsrfToken(): string

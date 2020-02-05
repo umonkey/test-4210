@@ -42,10 +42,16 @@ class TaskListController extends AbstractController
         $tasks = $this->tasks->getList(0, 300);
 
         $tasks = array_map(function (Task $task) use ($isAdmin) {
+            $text = htmlspecialchars($task->getText());
+
+            if ($task->getEdited()) {
+                $text .= "<br/>Отредактировано администратором";
+            }
+
             return [
                 htmlspecialchars($task->getUser()),
                 htmlspecialchars($task->getEmail()),
-                htmlspecialchars($task->getText()),
+                $text,
                 $task->getCompleted() ? 'completed' : 'pending',
                 $isAdmin ? "/tasks/{$task->getId()}/edit" : null,
             ];

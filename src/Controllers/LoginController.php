@@ -76,6 +76,8 @@ class LoginController extends AbstractController
             ]);
         }
 
+        $this->auth->setUser($request, $user);
+
         return $this->sendJSON([
             'result' => [
                 'redirect' => '/',

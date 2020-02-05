@@ -46,6 +46,11 @@
 
     {% if user.id %}
         <p>Вы залогинены как {{ user.name }}.</p>
+
+        <form class='async' action='/logout' method='post'>
+            <input type='hidden' name='csrf_token' value='{{ csrf_token }}'/>
+            <button class='btn btn-primary'>Выйти</button>
+        </form>
     {% else %}
         <p>Вы можете <a href='/login'>залогиниться</a>, чтобы редактировать задачи.</p>
     {% endif %}
