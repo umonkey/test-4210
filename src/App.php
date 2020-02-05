@@ -142,8 +142,13 @@ class App
         return $routeInfo;
     }
 
-    protected function notFound(RequestInterface $request)
+    protected function notFound(RequestInterface $request): ResponseInterface
     {
-        dd($request);
+        dd('page not found');  // TODO: render template
+    }
+
+    protected function methodNotAllowed(RequestInterface $request): ResponseInterface
+    {
+        dd('method not allowed');  // TODO: render template
     }
 }
