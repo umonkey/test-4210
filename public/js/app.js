@@ -13,7 +13,13 @@ jQuery(function ($) {
             'servecSide': true,
             'lengthChange': false,
             'searching': false,
-            'ajax': '/tasks.json'
+            'ajax': '/tasks.json',
+            'columnDefs': [{
+                'render': function (data, type, row) {
+                    return row[4] ? "<a href='" + row[4] + "'>edit</a>" : "";
+                },
+                'targets': 4
+            }]
         });
     }
 

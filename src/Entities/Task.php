@@ -35,6 +35,11 @@ class Task
      **/
     protected $completed;
 
+    /**
+     * @var bool
+     **/
+    protected $edited;
+
     public function __construct(array $row)
     {
         $this->id = empty($row['id']) ? null : (int)$row['id'];
@@ -42,6 +47,7 @@ class Task
         $this->email = $row['email'];
         $this->text = $row['text'];
         $this->completed = (bool)$row['completed'];
+        $this->edited = (bool)($row['edited'] ?? null);
     }
 
     public function asArray(): array
@@ -80,6 +86,11 @@ class Task
         return (bool)$this->completed;
     }
 
+    public function getEdited(): bool
+    {
+        return (bool)$this->edited;
+    }
+
     public function setId(int $id): void
     {
         $this->id = $id;
@@ -103,5 +114,10 @@ class Task
     public function setCompleted(bool $completed): void
     {
         $this->completed = $completed;
+    }
+
+    public function setEdited(bool $edited): void
+    {
+        $this->edited = $edited;
     }
 }

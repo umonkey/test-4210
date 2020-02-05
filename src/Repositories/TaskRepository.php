@@ -33,6 +33,11 @@ class TaskRepository
         $task->setId($id);
     }
 
+    public function count(): int
+    {
+        return (int)$this->db->fetchCell('SELECT COUNT(1) FROM tasks');
+    }
+
     public function get(int $id): ?Task
     {
         $row = $this->db->fetchOne('SELECT * FROM tasks WHERE id = ?', [$id]);
@@ -48,8 +53,16 @@ class TaskRepository
         }, $rows);
     }
 
-    public function count(): int
+    public function save(Task $task): void
     {
-        return (int)$this->db->fetchCell('SELECT COUNT(1) FROM tasks');
+        $this->db->update('tasks', [
+            'user' => $task->getUser(),
+            'email' => $task->getEmail(),
+            'text' => $task->getText(),
+            'completed' => $task->getCompleted(),
+            'edited' => $task->getEdited(),
+        ], [
+            'id' => $task->getId(),
+        ]);
     }
 }

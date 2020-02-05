@@ -12,6 +12,13 @@ use Nyholm\Psr7\Response;
 
 abstract class AbstractController
 {
+    protected function failJSON($message): Response
+    {
+        return $this->sendJSON([
+            'error' => $message,
+        ]);
+    }
+
     protected function sendJSON(array $data): Response
     {
         $data = json_encode($data);

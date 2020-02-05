@@ -67,6 +67,6 @@ class SessionService
             return $cookies[self::COOKIE];
         }
 
-        return $cookies[self::COOKIE];
+        return null;
     }
 }
