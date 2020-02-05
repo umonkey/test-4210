@@ -10,7 +10,7 @@ namespace App\Controllers;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Services\AuthService;
+use App\Services\AuthService;
 
 class HomeController extends AbstractController
 {
@@ -24,7 +24,6 @@ class HomeController extends AbstractController
     public function index(RequestInterface $request): ResponseInterface
     {
         $user = $this->auth->requireUser($request);
-        dd($user);
 
         return $this->sendText("OK, it works");
     }

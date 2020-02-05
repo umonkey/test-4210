@@ -34,6 +34,14 @@ class App
 
     public function handleRequest(RequestInterface $request): ResponseInterface
     {
+        set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
+            if (!(error_reporting() & $errno)) {
+                return false;
+            }
+
+            throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+        });
+
         $routeInfo = $this->matchRoute($request);
 
         switch ($routeInfo[0]) {
@@ -44,6 +52,8 @@ class App
             case \FastRoute\Dispatcher::FOUND:
                 $res = $this->dispatchRequest($request, $routeInfo[1], $routeInfo[2]);
         }
+
+        restore_error_handler();
 
         return $res;
     }
@@ -68,7 +78,20 @@ class App
     protected function dispatchRequest(RequestInterface $request, string $handler, array $args)
     {
         try {
-            $instance = $this->getHandlerInstance($handler);
+            $parts = explode(':', $handler, 2);
+            if (count($parts) != 2) {
+                throw new \RuntimeException('bad method handler');
+            }
+
+            $className = $parts[0];
+            $methodName = $parts[1];
+
+            if (!class_exists($parts[0])) {
+                throw new \RuntimeException("class {$className} not found");
+            }
+
+            $instance = $this->getHandlerInstance($className);
+
             return $instance->$methodName($request, $args);
         } catch (\Throwable $e) {
             dd($e);  // FIXME: render an error message
@@ -78,20 +101,8 @@ class App
     /**
      * Create the handler object, inject dependencies.
      **/
-    protected function getHandlerInstance(string $handler): object
+    protected function getHandlerInstance(string $className): object
     {
-        $parts = explode(':', $handler, 2);
-        if (count($parts) != 2) {
-            throw new \RuntimeException('bad method handler');
-        }
-
-        $className = $parts[0];
-        $methodName = $parts[1];
-
-        if (!class_exists($parts[0])) {
-            throw new \RuntimeException("class {$className} not found");
-        }
-
         $args = [];
 
         $refClass = new \ReflectionClass($className);
