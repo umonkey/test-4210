@@ -43,9 +43,9 @@ class TaskListController extends AbstractController
 
         $tasks = array_map(function (Task $task) use ($isAdmin) {
             return [
-                $task->getUser(),
-                $task->getEmail(),
-                $task->getText(),
+                htmlspecialchars($task->getUser()),
+                htmlspecialchars($task->getEmail()),
+                htmlspecialchars($task->getText()),
                 $task->getCompleted() ? 'completed' : 'pending',
                 $isAdmin ? "/tasks/{$task->getId()}/edit" : null,
             ];
