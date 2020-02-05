@@ -1,0 +1,4 @@
+all:
+
+migrate:
+	phinx migrate
