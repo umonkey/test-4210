@@ -1,2 +1,2 @@
 ^vendor$
-^(var|tmp)$
+^(var|tmp|u)$

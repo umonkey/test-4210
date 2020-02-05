@@ -11,6 +11,7 @@ use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use App\Services\DatabaseService;
 use App\Services\SessionService;
+use App\Services\TemplateService;
 
 $container['auth'] = function ($c) {
     $session = $c['session'];
@@ -35,6 +36,11 @@ $container['settings'] = function ($c) {
 $container['tasks'] = function ($c) {
     $db = $c['db'];
     return new TaskRepository($db);
+};
+
+$container['templates'] = function ($c) {
+    $config = $c['settings']['templates'] ?? [];
+    return new TemplateService($config);
 };
 
 $container['users'] = function ($c) {

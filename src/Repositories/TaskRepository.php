@@ -28,7 +28,7 @@ class TaskRepository
 
     public function getList(int $offset, int $limit): array
     {
-        $rows = $this->db->fetch('SELECT * FROM tasks ORDER BY user');
+        $rows = $this->db->fetch(sprintf("SELECT * FROM tasks ORDER BY user LIMIT %u, %u", $offset, $limit));
 
         return array_map(function (array $row) {
             return new Task($row);

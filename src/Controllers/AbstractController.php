@@ -19,7 +19,11 @@ abstract class AbstractController
 
     protected function sendHtml(string $html, int $status = 200): Response
     {
-        dd($html);
+        $headers = [
+            'Content-Type' => 'text/html',
+        ];
+
+        return new Response($status, $headers, $html);
     }
 
     protected function sendText(string $body, int $status = 200): Response
