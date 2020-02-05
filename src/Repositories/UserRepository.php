@@ -13,6 +13,9 @@ use App\Entities\User;
 
 class UserRepository
 {
+    /**
+     * @var DatabaseService
+     **/
     protected $db;
 
     public function __construct(DatabaseService $db)
@@ -23,6 +26,12 @@ class UserRepository
     public function get(int $id): ?User
     {
         $row = $this->db->fetchOne('SELECT * FROM users WHERE id = ?', [$id]);
-        return new User($row);
+        return $row ? new User($row) : null;
+    }
+
+    public function getByLogin(string $login): ?User
+    {
+        $row = $this->db->fetchOne('SELECT * FROM users WHERE name = ?', [$login]);
+        return $row ? new User($row) : null;
     }
 }

@@ -20,7 +20,7 @@ class User
     {
         $this->id = (int)$row['id'];
         $this->name = $row['name'];
-        $this->pasword = $row['password'];
+        $this->password = $row['password'];
     }
 
     public function asArray(): array
@@ -30,6 +30,16 @@ class User
             'name' => $this->name,
             'password' => $this->password,
         ];
+    }
+
+    public function checkPassword(string $given): bool
+    {
+        // Password login disabled.
+        if (empty($this->password)) {
+            return false;
+        }
+
+        return password_verify($given, $this->getPassword());
     }
 
     public function getId(): ?int
@@ -44,7 +54,7 @@ class User
 
     public function getPassword(): ?string
     {
-        return $this->getPassword();
+        return $this->password;
     }
 
     public function setId(int $id): void

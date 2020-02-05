@@ -3,20 +3,20 @@
  **/
 
 jQuery(function ($) {
-    var em = $('table.tasklist:first');
+    var em, table;
 
-    if (em.length == 0) {
-        return;
+    em = $('table.tasklist:first');
+    if (em.length == 1) {
+        table = em.DataTable({
+            'processing': true,
+            'pageLength': 3,
+            'servecSide': true,
+            'lengthChange': false,
+            'searching': false,
+            'ajax': '/tasks.json'
+        });
     }
 
-    var table = em.DataTable({
-        'processing': true,
-        'pageLength': 3,
-        'servecSide': true,
-        'lengthChange': false,
-        'searching': false,
-        'ajax': '/tasks.json'
-    });
 
     $(document).on('submit', 'form.async', function (e) {
         var url, method, form;
@@ -36,7 +36,15 @@ jQuery(function ($) {
             } else if (res.result) {
                 if (res.result.refresh) {
                     form[0].reset();
-                    table.ajax.reload();
+                    if (table) {
+                        table.ajax.reload();
+                    }
+                    return;
+                }
+
+                else if (res.result.redirect) {
+                    window.location.href = res.result.redirect;
+                    return;
                 }
 
                 if (res.result.message) {
@@ -44,7 +52,7 @@ jQuery(function ($) {
                 }
             }
         }).fail(function () {
-            alert('Не удалось добавить задачу.');
+            alert('Не удалось обработать форму.');
         });
 
         e.preventDefault();
