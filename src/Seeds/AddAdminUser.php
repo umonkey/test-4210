@@ -7,6 +7,7 @@ class AddAdminUser extends AbstractSeed
     public function run()
     {
         $table = $this->table('users');
+        $table->truncate();
 
         $table->insert([[
             'id' => 1,

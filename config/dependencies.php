@@ -6,6 +6,7 @@
 
 declare(strict_types=1);
 
+use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Services\AuthService;
 use App\Services\DatabaseService;
@@ -29,6 +30,11 @@ $container['session'] = function ($c) {
 
 $container['settings'] = function ($c) {
     return require __DIR__ . '/settings.php';
+};
+
+$container['tasks'] = function ($c) {
+    $db = $c['db'];
+    return new TaskRepository($db);
 };
 
 $container['users'] = function ($c) {
