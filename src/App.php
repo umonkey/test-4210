@@ -8,19 +8,28 @@ namespace App;
 
 use function FastRoute\simpleDispatcher;
 use FastRoute\RouteCollector;
+use Pimple\Container;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class App
 {
     /**
-     * @var
+     * @var RouteCollector
      **/
-    protected $router;
+    protected $routes;
+
+    /**
+     * Dependency container.
+     *
+     * @var Container
+     **/
+    protected $container;
 
     public function __construct()
     {
         $this->routes = $this->loadRoutes();
+        $this->container = $this->loadContainer();
     }
 
     public function handleRequest(RequestInterface $request): ResponseInterface
@@ -58,6 +67,19 @@ class App
 
     protected function dispatchRequest(RequestInterface $request, string $handler, array $args)
     {
+        try {
+            $instance = $this->getHandlerInstance($handler);
+            return $instance->$methodName($request, $args);
+        } catch (\Throwable $e) {
+            dd($e);  // FIXME: render an error message
+        }
+    }
+
+    /**
+     * Create the handler object, inject dependencies.
+     **/
+    protected function getHandlerInstance(string $handler): object
+    {
         $parts = explode(':', $handler, 2);
         if (count($parts) != 2) {
             throw new \RuntimeException('bad method handler');
@@ -70,8 +92,26 @@ class App
             throw new \RuntimeException("class {$className} not found");
         }
 
-        $handlerInstance = new $className();
-        return $handlerInstance->$methodName($request, $args);
+        $args = [];
+
+        $refClass = new \ReflectionClass($className);
+        if ($refClass->hasMethod('__construct')) {
+            $refMethod = $refClass->getConstructor();
+            foreach ($refMethod->getParameters() as $param) {
+                $serviceName = $param->getName();
+                $args[] = $this->container[$serviceName];
+            }
+        }
+
+        $handlerInstance = $refClass->newInstanceArgs($args);
+        return $handlerInstance;
+    }
+
+    protected function loadContainer(): Container
+    {
+        $container = new Container();
+        require __DIR__ . '/../config/dependencies.php';
+        return $container;
     }
 
     protected function loadRoutes()
