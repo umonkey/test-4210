@@ -56,7 +56,11 @@ class EditTaskController extends AbstractController
 
     public function save(RequestInterface $request, array $args): ResponseInterface
     {
-        $user = $this->auth->requireUser($request);
+        $user = $this->auth->getUser($request);
+
+        if (null === $user) {
+            return $this->failJSON('Для изменения задач нужно авторизоваться.  Пройдите на главную страницу.');
+        }
 
         if (null === $user || $user->getName() != 'admin') {
             return $this->failJSON('Нет доступа.');
