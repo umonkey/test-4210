@@ -45,12 +45,10 @@ jQuery(function ($) {
                     if (table) {
                         table.ajax.reload();
                     }
-                    return;
                 }
 
                 else if (res.result.redirect) {
                     window.location.href = res.result.redirect;
-                    return;
                 }
 
                 if (res.result.message) {
