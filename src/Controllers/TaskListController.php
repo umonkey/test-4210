@@ -36,11 +36,47 @@ class TaskListController extends AbstractController
     {
         $user = $this->auth->getUser($request);
         $isAdmin = $user && $user->getName() === 'admin';
+        $form = $request->getParsedBody();
+
+        $draw = $form['draw'];
+        $start = (int)$form['start'];
+        $limit = (int)$form['length'];
 
         $total = $this->tasks->count();
 
-        $tasks = $this->tasks->getList(0, 300);
+        $order = $this->getOrder($form);
+        $tasks = $this->tasks->getList($start, $limit, $order);
 
+
+        $data = [
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $this->formatTasks($tasks, $isAdmin),
+            'draw' => $draw,
+        ];
+
+        return $this->sendJSON($data);
+    }
+
+    private function getOrder(array $form): array
+    {
+        $order = [];
+        $columns = ['user', 'email', null, 'completed', null];
+
+        foreach ($form['order'] as $col) {
+            $dir = $col['dir'] === 'asc' ? 'ASC' : 'DESC';
+            $column = $columns[(int)$col['column']];
+
+            if ($column !== null) {
+                $order[$column] = $dir;
+            }
+        }
+
+        return $order;
+    }
+
+    private function formatTasks(array $tasks, bool $isAdmin): array
+    {
         $tasks = array_map(function (Task $task) use ($isAdmin) {
             $text = htmlspecialchars($task->getText());
 
@@ -57,12 +93,6 @@ class TaskListController extends AbstractController
             ];
         }, $tasks);
 
-        $data = [
-            'iTotalRecords' => $total,
-            'iTotalDisplayRecords' => count($tasks),
-            'aaData' => $tasks,
-        ];
-
-        return $this->sendJSON($data);
+        return $tasks;
     }
 }

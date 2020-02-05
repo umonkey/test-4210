@@ -10,15 +10,22 @@ jQuery(function ($) {
         table = em.DataTable({
             'processing': true,
             'pageLength': 3,
-            'servecSide': true,
+            'serverSide': true,
             'lengthChange': false,
             'searching': false,
-            'ajax': '/tasks.json',
+            'ajax': {
+                'url': '/tasks.json',
+                'type': 'POST'
+            },
             'columnDefs': [{
                 'render': function (data, type, row) {
                     return row[4] ? "<a href='" + row[4] + "'>edit</a>" : "";
                 },
+                'orderable': false,
                 'targets': 4
+            }, {
+                'orderable': false,
+                'targets': 2
             }]
         });
     }

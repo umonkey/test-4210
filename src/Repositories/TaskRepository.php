@@ -44,9 +44,21 @@ class TaskRepository
         return new Task($row);
     }
 
-    public function getList(int $offset, int $limit): array
+    public function getList(int $offset, int $limit, array $order = []): array
     {
-        $rows = $this->db->fetch(sprintf("SELECT * FROM tasks ORDER BY user LIMIT %u, %u", $offset, $limit));
+        $query = "SELECT * FROM tasks";
+
+        if (!empty($order)) {
+            $_order = [];
+            foreach ($order as $k => $v) {
+                $_order[] = sprintf('%s %s', $k, $v);
+            }
+            $query .= ' ORDER BY ' . implode(', ', $_order);
+        }
+
+        $query .= sprintf(" LIMIT %u, %u", $offset, $limit);
+
+        $rows = $this->db->fetch($query);
 
         return array_map(function (array $row) {
             return new Task($row);
